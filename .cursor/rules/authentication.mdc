@@ -1,0 +1,80 @@
+---
+description: Patrones de autenticación con Laravel Sanctum
+globs: "**/auth/**,**/middleware/**,**/useAuth**,**/AuthGuard**"
+alwaysApply: false
+---
+
+# Autenticación - Laravel Sanctum
+
+## Flujo de Autenticación
+
+1. Obtener CSRF token: `GET /sanctum/csrf-cookie`
+2. Login: `POST /api/auth/login`
+3. Obtener usuario: `GET /api/auth/user`
+4. Logout: `POST /api/auth/logout`
+
+## Composable useAuth
+
+```typescript
+const { user, loading, login, logout, fetchUser } = useAuth()
+
+// Login
+await login({ email, password, remember: true })
+
+// Logout
+await logout()
+await navigateTo('/login')
+
+// Verificar autenticación
+if (user.value) {
+  // Usuario autenticado
+}
+```
+
+## Middleware de Autenticación
+
+```typescript
+// app/middleware/auth.global.ts
+export default defineNuxtRouteMiddleware(async (to) => {
+  if (import.meta.server) return // Skip SSR
+  
+  const { user, fetchUser } = useAuth()
+  const publicPages = new Set(['/login', '/register', '/forgot-password'])
+  
+  if (!user.value && !publicPages.has(to.path)) {
+    return navigateTo('/login')
+  }
+})
+```
+
+## AuthGuard Component
+
+```vue
+<!-- Para proteger contenido hasta verificar auth -->
+<AuthGuard>
+  <ProtectedContent />
+</AuthGuard>
+```
+
+## Layouts
+
+- `blank`: Para páginas públicas (login, register)
+- `default`: Para páginas autenticadas (incluye sidebar)
+
+```typescript
+definePageMeta({
+  layout: 'blank' // o 'default'
+})
+```
+
+## Headers Requeridos
+
+```typescript
+// El plugin api.ts los agrega automáticamente
+{
+  'Accept': 'application/json',
+  'X-Requested-With': 'XMLHttpRequest',
+  'X-XSRF-TOKEN': csrfToken, // Automático
+  'Content-Type': 'application/json'
+}
+```

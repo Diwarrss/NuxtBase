@@ -1,0 +1,95 @@
+---
+description: Convenciones TypeScript del proyecto
+globs: "**/*.ts"
+alwaysApply: false
+---
+
+# TypeScript - Convenciones
+
+## Tipos del Proyecto
+
+```typescript
+// Definir tipos en app/types/
+export interface AuthUser {
+  id: number
+  name: string
+  email: string
+  roles?: string[]
+  permissions?: string[]
+}
+
+// Usar type para aliases simples
+type LoginPayload = {
+  email: string
+  password: string
+  remember?: boolean
+}
+```
+
+## Composables
+
+```typescript
+// Siempre exportar función nombrada con prefijo 'use'
+export function useAuth() {
+  const { $api, $csrf } = useNuxtApp()
+  
+  // Usar useState para estado global compartido
+  const user = useState<AuthUser | null>('auth.user', () => null)
+  
+  // Funciones async con try/finally para loading
+  async function login(payload: LoginPayload) {
+    loading.value = true
+    try {
+      // ...
+    } finally {
+      loading.value = false
+    }
+  }
+  
+  return {
+    user,
+    loading,
+    login
+  }
+}
+```
+
+## Middleware
+
+```typescript
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  // Skip SSR para evitar hydration issues
+  if (import.meta.server) {
+    return
+  }
+  
+  // Navegación
+  return navigateTo('/login')
+})
+```
+
+## Plugins
+
+```typescript
+export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig()
+  
+  const $api = $fetch.create({
+    baseURL: `${config.public.apiBase}/api`,
+    credentials: 'include'
+  })
+  
+  return {
+    provide: {
+      api: $api
+    }
+  }
+})
+```
+
+## Buenas Prácticas
+
+- ✅ Tipar explícitamente parámetros de funciones
+- ✅ Usar `readonly` para props que no cambian
+- ✅ Usar genéricos cuando sea apropiado: `useState<T>`
+- ❌ Evitar `any` - usar `unknown` si es necesario

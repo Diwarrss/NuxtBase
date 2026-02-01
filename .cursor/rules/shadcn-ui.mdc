@@ -1,0 +1,87 @@
+---
+description: Componentes Shadcn-Vue y patrones de UI
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Shadcn-Vue UI Components
+
+## Componentes Disponibles
+
+### Layout
+- `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`
+- `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`
+- `Sheet`, `Drawer`
+- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
+
+### Formularios
+- `Input`, `Textarea`, `Select`, `Checkbox`, `Switch`
+- `Button` (variants: default, destructive, outline, secondary, ghost, link)
+- `Label`, `FormField`, `FormItem`, `FormLabel`, `FormMessage`
+
+### Tablas
+- `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`
+
+### Feedback
+- `Alert`, `Badge`, `Progress`, `Skeleton`
+- Toast: usar `vue-sonner` con `<Toaster />`
+
+### Navegación
+- `Sidebar`, `SidebarProvider`, `SidebarContent`, `SidebarGroup`
+- `Breadcrumb`, `DropdownMenu`, `NavigationMenu`
+
+## Patrones Comunes
+
+### Card con Header y Acciones
+```vue
+<Card>
+  <CardHeader>
+    <CardTitle>Título</CardTitle>
+    <CardDescription>Descripción</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <!-- Contenido -->
+  </CardContent>
+</Card>
+```
+
+### Tabla con Datos
+```vue
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Columna</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow v-for="item in items" :key="item.id">
+      <TableCell>{{ item.value }}</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+### Botones
+```vue
+<Button>Default</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="destructive">Eliminar</Button>
+<Button variant="ghost" size="sm">
+  <Icon name="i-lucide-edit" class="h-4 w-4" />
+</Button>
+```
+
+### Badge
+```vue
+<Badge>Default</Badge>
+<Badge variant="secondary">Secondary</Badge>
+<Badge variant="outline">Outline</Badge>
+```
+
+## Iconos
+
+```vue
+<!-- Usando @nuxt/icon con lucide -->
+<Icon name="i-lucide-plus" class="h-4 w-4" />
+<Icon name="i-lucide-loader-2" class="h-4 w-4 animate-spin" />
+```

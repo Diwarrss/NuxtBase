@@ -1,0 +1,87 @@
+---
+description: Sistema de roles y permisos integrado con Laravel Spatie Permission
+globs: "**/usePermissions**,**/PermissionGate**,**/permission**,**/role**"
+alwaysApply: false
+---
+
+# Roles y Permisos
+
+## Composable usePermissions
+
+```typescript
+const { 
+  hasRole, 
+  hasAnyRole, 
+  hasPermission, 
+  hasAnyPermission,
+  isAdmin, 
+  roles, 
+  permissions 
+} = usePermissions()
+
+// Verificaciones
+if (hasPermission('users.edit')) { }
+if (hasAnyPermission(['users.view', 'users.edit'])) { }
+if (hasRole('admin')) { }
+if (isAdmin.value) { } // Computed
+```
+
+## PermissionGate Component
+
+```vue
+<!-- Por permiso -->
+<PermissionGate permission="users.create">
+  <Button>Crear</Button>
+</PermissionGate>
+
+<!-- Múltiples permisos (cualquiera) -->
+<PermissionGate :any-permission="['users.edit', 'users.delete']">
+  <Button>Acciones</Button>
+</PermissionGate>
+
+<!-- Por rol -->
+<PermissionGate role="admin">
+  <AdminPanel />
+</PermissionGate>
+
+<!-- Solo administradores -->
+<PermissionGate admin-only>
+  <SuperAdminContent />
+</PermissionGate>
+
+<!-- Con fallback -->
+<PermissionGate permission="users.delete" :fallback="true">
+  <Button>Eliminar</Button>
+  <template #fallback>
+    <span class="text-muted">Sin permiso</span>
+  </template>
+</PermissionGate>
+```
+
+## Middleware de Permisos
+
+```typescript
+// En definePageMeta
+definePageMeta({
+  middleware: 'permission',
+  permissions: 'users.view' // o ['users.view', 'users.edit']
+})
+```
+
+## Menú Filtrado por Permisos
+
+```typescript
+// En constants/menus.ts
+{
+  title: 'Usuarios',
+  icon: 'i-lucide-users',
+  link: '/admin/users',
+  permission: 'users.view' // Solo visible si tiene permiso
+}
+```
+
+## Permisos del Sistema
+
+- `users.view`, `users.create`, `users.edit`, `users.delete`
+- `roles.view`, `roles.create`, `roles.edit`, `roles.delete`
+- `admin.access`, `dashboard.view`

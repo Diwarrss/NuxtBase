@@ -1,0 +1,47 @@
+---
+description: Convenciones generales del proyecto Nuxt 4 con Shadcn-Vue y Laravel Sanctum
+alwaysApply: true
+---
+
+# Estructura del Proyecto NuxtBase
+
+## Arquitectura
+
+- **Framework**: Nuxt 4 con `srcDir: app/`
+- **UI**: Shadcn-Vue + Tailwind CSS 4
+- **Backend**: Laravel 12 con Sanctum (SPA authentication)
+- **Estado**: Pinia + useState (Nuxt)
+- **Iconos**: @nuxt/icon con lucide-icons
+
+## Directorios Principales
+
+```
+app/
+├── components/     # Componentes Vue (auto-importados)
+│   └── ui/         # Componentes Shadcn-Vue
+├── composables/    # Composables reutilizables
+├── layouts/        # Layouts de la aplicación
+├── middleware/     # Middlewares de rutas
+├── pages/          # Páginas (file-based routing)
+├── plugins/        # Plugins de Nuxt
+└── types/          # Definiciones TypeScript
+```
+
+## Convenciones de Nomenclatura
+
+- **Componentes**: PascalCase (`AuthGuard.vue`, `PermissionGate.vue`)
+- **Composables**: camelCase con prefijo `use` (`useAuth.ts`, `usePermissions.ts`)
+- **Páginas**: kebab-case (`admin/users/index.vue`)
+- **Tipos**: PascalCase (`AuthUser`, `NavLink`)
+
+## Importaciones
+
+- Usar alias `~/` para imports desde `app/`
+- Componentes, composables y utils se auto-importan
+- NO usar `import { ref, computed }` - están auto-importados
+
+## SSR Considerations
+
+- Usar `import.meta.server` para código solo-servidor
+- Usar `import.meta.client` o `onMounted` para código solo-cliente
+- Envolver contenido sensible a auth en `ClientOnly` o `AuthGuard`

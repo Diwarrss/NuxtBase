@@ -1,0 +1,84 @@
+---
+description: Patrones de componentes Vue y Shadcn-Vue
+globs: "**/*.vue"
+alwaysApply: false
+---
+
+# Componentes Vue - Patrones
+
+## Estructura de Componente
+
+```vue
+<script setup lang="ts">
+// 1. Imports de tipos
+import type { SomeType } from '~/types/something'
+
+// 2. definePageMeta (solo en pages/)
+definePageMeta({
+  layout: 'default',
+  middleware: 'permission',
+  permissions: 'users.view'
+})
+
+// 3. Props y emits
+const props = defineProps<{
+  title: string
+  loading?: boolean
+}>()
+
+// 4. Composables
+const { user } = useAuth()
+const { hasPermission } = usePermissions()
+
+// 5. Estado reactivo
+const isOpen = ref(false)
+
+// 6. Computeds
+const canEdit = computed(() => hasPermission('users.edit'))
+
+// 7. Funciones
+function handleClick() {
+  // ...
+}
+
+// 8. Lifecycle hooks
+onMounted(() => {
+  // Solo código cliente
+})
+</script>
+
+<template>
+  <!-- Template aquí -->
+</template>
+```
+
+## Shadcn-Vue Components
+
+- Componentes UI en `components/ui/`
+- Sin prefijo: `<Button>`, `<Card>`, `<Input>`
+- Usar variantes: `<Button variant="destructive" size="sm">`
+
+## Componentes de Layout
+
+- Prefijo `Layout`: `<LayoutAppSidebar />`, `<LayoutHeader />`
+- Auto-importados desde `components/layout/`
+
+## Control de Acceso en Templates
+
+```vue
+<!-- Condicional por permiso -->
+<PermissionGate permission="users.create">
+  <Button>Crear Usuario</Button>
+</PermissionGate>
+
+<!-- Solo admin -->
+<PermissionGate admin-only>
+  <AdminPanel />
+</PermissionGate>
+```
+
+## Evitar
+
+- ❌ NO usar `console.log` en producción
+- ❌ NO acceder a `window` sin verificar SSR
+- ❌ NO usar `v-if` con `v-for` en el mismo elemento

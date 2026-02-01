@@ -1,0 +1,110 @@
+---
+description: Integración con API Laravel
+globs: "**/plugins/api**,**/composables/**,**/pages/admin/**"
+alwaysApply: false
+---
+
+# API Integration - Laravel
+
+## Plugin $api
+
+```typescript
+// Usar el plugin $api para todas las llamadas al backend
+const { $api } = useNuxtApp()
+
+// GET
+const users = await $api('/users')
+
+// GET con query params
+const users = await $api('/users', {
+  query: { search: 'john', page: 1, per_page: 15 }
+})
+
+// POST
+const user = await $api('/users', {
+  method: 'POST',
+  body: { name, email, password }
+})
+
+// PUT
+await $api(`/users/${id}`, {
+  method: 'PUT',
+  body: { name, email }
+})
+
+// DELETE
+await $api(`/users/${id}`, { method: 'DELETE' })
+```
+
+## Manejo de Errores
+
+```typescript
+try {
+  await $api('/users', { method: 'POST', body: data })
+} catch (error: any) {
+  // Laravel validation errors
+  if (error?.data?.errors) {
+    const firstError = Object.values(error.data.errors)[0]?.[0]
+  }
+  
+  // Error message general
+  const message = error?.data?.message || error?.message || 'Error desconocido'
+}
+```
+
+## Paginación
+
+```typescript
+interface PaginatedResponse<T> {
+  data: T[]
+  meta: {
+    current_page: number
+    last_page: number
+    per_page: number
+    total: number
+  }
+}
+
+const res = await $api<PaginatedResponse<User>>('/users', {
+  query: { page: 1, per_page: 15 }
+})
+```
+
+## CSRF Token
+
+```typescript
+// Para mutaciones, asegurar CSRF primero
+const { $api, $csrf } = useNuxtApp()
+
+await $csrf() // Obtiene/refresca token
+await $api('/auth/login', { method: 'POST', body: { ... } })
+```
+
+## Endpoints del Proyecto
+
+```
+Auth:
+- POST /api/auth/login
+- POST /api/auth/logout
+- GET  /api/auth/user
+- POST /api/auth/forgot-password
+- POST /api/auth/reset-password
+
+Users:
+- GET    /api/users
+- GET    /api/users/{id}
+- POST   /api/users
+- PUT    /api/users/{id}
+- DELETE /api/users/{id}
+
+Roles:
+- GET    /api/roles
+- GET    /api/roles/permissions
+- POST   /api/roles
+- PUT    /api/roles/{id}
+- DELETE /api/roles/{id}
+
+Audit:
+- GET /api/audit
+- GET /api/audit/{id}
+```
