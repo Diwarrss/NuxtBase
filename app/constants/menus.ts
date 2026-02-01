@@ -5,7 +5,7 @@ export const navMenu: NavMenu[] = [
     heading: 'General',
     items: [
       {
-        title: 'Home',
+        title: 'Dashboard',
         icon: 'i-lucide-home',
         link: '/',
       },
@@ -18,6 +18,29 @@ export const navMenu: NavMenu[] = [
         title: 'Tasks',
         icon: 'i-lucide-calendar-check-2',
         link: '/tasks',
+      },
+    ],
+  },
+  {
+    heading: 'Administración',
+    items: [
+      {
+        title: 'Usuarios',
+        icon: 'i-lucide-users',
+        link: '/admin/users',
+        permission: 'users.view',
+      },
+      {
+        title: 'Roles y Permisos',
+        icon: 'i-lucide-shield-check',
+        link: '/admin/roles',
+        permission: 'roles.view',
+      },
+      {
+        title: 'Auditoría',
+        icon: 'i-lucide-file-text',
+        link: '/admin/audit',
+        permission: 'admin.access',
       },
     ],
   },

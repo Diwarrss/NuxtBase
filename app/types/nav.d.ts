@@ -3,6 +3,11 @@ export interface NavLink {
   link: string
   icon?: string
   new?: boolean
+  permission?: string
+  anyPermission?: string[]
+  role?: string
+  anyRole?: string[]
+  adminOnly?: boolean
 }
 
 export interface NavSectionTitle {
@@ -14,6 +19,11 @@ export interface NavGroup {
   icon?: string
   new?: boolean
   children: NavLink[]
+  permission?: string
+  anyPermission?: string[]
+  role?: string
+  anyRole?: string[]
+  adminOnly?: boolean
 }
 
 export interface NavMenu {

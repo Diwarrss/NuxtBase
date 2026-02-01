@@ -2,6 +2,15 @@
 import NumberFlow from '@number-flow/vue'
 import { TrendingDown, TrendingUp, TrendingUpIcon } from 'lucide-vue-next'
 
+// El dashboard es accesible para todos los usuarios autenticados
+// Si necesitas protegerlo con permisos, descomenta la siguiente línea:
+// definePageMeta({
+//   middleware: 'permission:dashboard.view'
+// })
+
+const { user } = useAuth()
+const { roles, permissions, isAdmin } = usePermissions()
+
 const dataCard = ref({
   totalRevenue: 0,
   newCustomers: 0,
@@ -195,6 +204,44 @@ watch(isDesktop, () => {
           <DashboardTotalVisitors :time-range="timeRange" />
         </CardContent>
       </Card>
+
+      <!-- Información de Roles y Permisos (solo para admin) -->
+      <PermissionGate admin-only>
+        <Card>
+          <CardHeader>
+            <CardTitle>Información de Acceso</CardTitle>
+            <CardDescription>
+              Roles y permisos del usuario actual
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-4">
+              <div>
+                <div class="text-sm font-medium mb-2">Roles:</div>
+                <div class="flex flex-wrap gap-2">
+                  <Badge v-for="role in roles" :key="role" variant="default">
+                    {{ role }}
+                  </Badge>
+                  <Badge v-if="roles.length === 0" variant="outline">
+                    Sin roles asignados
+                  </Badge>
+                </div>
+              </div>
+              <div>
+                <div class="text-sm font-medium mb-2">Permisos ({{ permissions.length }}):</div>
+                <div class="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
+                  <Badge v-for="permission in permissions" :key="permission" variant="outline" class="text-xs">
+                    {{ permission }}
+                  </Badge>
+                  <Badge v-if="permissions.length === 0" variant="outline">
+                    Sin permisos asignados
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </PermissionGate>
     </main>
   </div>
 </template>

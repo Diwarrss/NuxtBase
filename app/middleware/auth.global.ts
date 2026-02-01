@@ -6,6 +6,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const { user, fetchUser } = useAuth()
   const guestOnly = new Set(['/login', '/forgot-password', '/reset-password', '/register'])
+  const publicPages = new Set(['/login', '/forgot-password', '/reset-password', '/register', '/unauthorized'])
 
   // Avoid refetching on every navigation
   const checked = useState<boolean>('auth.checked', () => false)
@@ -25,11 +26,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // If logged in, redirect away from guest pages
   if (isLoggedIn && guestOnly.has(to.path)) {
+    // Redirigir al dashboard, pero solo si tiene el permiso necesario
+    // Si no tiene permiso, el middleware de permisos lo manejará
     return navigateTo('/')
   }
 
-  // If not logged in, redirect to login (except for guest pages)
-  if (!isLoggedIn && !guestOnly.has(to.path)) {
+  // If not logged in, redirect to login (except for guest pages and public pages)
+  if (!isLoggedIn && !publicPages.has(to.path)) {
     return navigateTo('/login')
   }
 })
