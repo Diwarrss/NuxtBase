@@ -129,7 +129,8 @@ Protege rutas basadas en permisos.
 ```vue
 <script setup>
 definePageMeta({
-  middleware: ['permission:users.view']
+  middleware: 'permission',
+  permissions: 'users.view'
 })
 </script>
 ```
@@ -139,7 +140,19 @@ Múltiples permisos (cualquiera):
 ```vue
 <script setup>
 definePageMeta({
-  middleware: ['permission:users.view|users.edit']
+  middleware: 'permission',
+  permissions: ['users.view', 'users.edit']
+})
+</script>
+```
+
+O usando string con separador:
+
+```vue
+<script setup>
+definePageMeta({
+  middleware: 'permission',
+  permissions: 'users.view|users.edit'
 })
 </script>
 ```
@@ -151,7 +164,8 @@ Protege rutas basadas en roles.
 ```vue
 <script setup>
 definePageMeta({
-  middleware: ['role:admin']
+  middleware: 'role',
+  roles: 'admin'
 })
 </script>
 ```
@@ -161,7 +175,19 @@ Múltiples roles (cualquiera):
 ```vue
 <script setup>
 definePageMeta({
-  middleware: ['role:admin|moderator']
+  middleware: 'role',
+  roles: ['admin', 'moderator']
+})
+</script>
+```
+
+O usando string con separador:
+
+```vue
+<script setup>
+definePageMeta({
+  middleware: 'role',
+  roles: 'admin|moderator'
 })
 </script>
 ```

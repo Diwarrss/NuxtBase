@@ -44,6 +44,11 @@ const user = computed(() => ({
 
 // Filtrar elementos del menú basados en permisos
 function canAccessItem(item: NavLink | NavGroup): boolean {
+  // Si no hay usuario autenticado, no mostrar elementos con permisos
+  if (!authUser.value) {
+    return !item.permission && !item.role && !item.adminOnly
+  }
+
   // Los administradores siempre tienen acceso
   if (isAdmin.value) {
     return true
@@ -54,24 +59,38 @@ function canAccessItem(item: NavLink | NavGroup): boolean {
     return false
   }
 
+  // Si no tiene permisos definidos, permitir acceso
+  if (!item.permission && !item.anyPermission && !item.role && !item.anyRole) {
+    return true
+  }
+
   // Verificar permisos individuales
-  if (item.permission && !hasPermission(item.permission)) {
-    return false
+  if (item.permission) {
+    const hasAccess = hasPermission(item.permission)
+    if (!hasAccess) {
+      return false
+    }
   }
 
   // Verificar anyPermission
-  if (item.anyPermission && item.anyPermission.length > 0 && !hasAnyPermission(item.anyPermission)) {
-    return false
+  if (item.anyPermission && item.anyPermission.length > 0) {
+    if (!hasAnyPermission(item.anyPermission)) {
+      return false
+    }
   }
 
   // Verificar rol individual
-  if (item.role && !hasRole(item.role)) {
-    return false
+  if (item.role) {
+    if (!hasRole(item.role)) {
+      return false
+    }
   }
 
   // Verificar anyRole
-  if (item.anyRole && item.anyRole.length > 0 && !hasAnyRole(item.anyRole)) {
-    return false
+  if (item.anyRole && item.anyRole.length > 0) {
+    if (!hasAnyRole(item.anyRole)) {
+      return false
+    }
   }
 
   return true
@@ -79,9 +98,29 @@ function canAccessItem(item: NavLink | NavGroup): boolean {
 
 // Filtrar menú basado en permisos
 const filteredNavMenu = computed(() => {
-  return navMenu.map(section => ({
-    ...section,
-    items: section.items.filter(item => {
+  // Debug: mostrar información del usuario y permisos
+  if (import.meta.dev) {
+    console.log('🔍 Menu Debug:', {
+      user: authUser.value,
+      isAdmin: isAdmin.value,
+      roles: authUser.value?.roles,
+      permissions: authUser.value?.permissions
+    })
+  }
+
+  return navMenu.map(section => {
+    const filteredItems = section.items.filter(item => {
+      const canAccess = canAccessItem(item)
+      
+      // Debug para items de administración
+      if (import.meta.dev && section.heading === 'Administración') {
+        console.log(`  ✓ ${item.title}:`, {
+          canAccess,
+          permission: item.permission,
+          hasPermission: item.permission ? hasPermission(item.permission) : 'N/A'
+        })
+      }
+
       // Si es un grupo, filtrar también los hijos
       if ('children' in item) {
         const filteredChildren = item.children.filter(child => canAccessItem(child))
@@ -89,15 +128,20 @@ const filteredNavMenu = computed(() => {
         if (filteredChildren.length === 0) {
           return false
         }
-        // Actualizar los hijos filtrados
-        item.children = filteredChildren
+        // Crear una copia del item con hijos filtrados
+        const itemCopy = { ...item, children: filteredChildren }
         // Verificar si el grupo mismo tiene restricciones
-        return canAccessItem(item)
+        return canAccessItem(itemCopy)
       }
       // Si es un link simple, verificar permisos
-      return canAccessItem(item)
+      return canAccess
     })
-  })).filter(section => section.items.length > 0) // Solo mostrar secciones con items visibles
+    
+    return {
+      ...section,
+      items: filteredItems
+    }
+  }).filter(section => section.items.length > 0) // Solo mostrar secciones con items visibles
 })
 </script>
 

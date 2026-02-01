@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
+    // '@nuxtjs/i18n', // Temporalmente deshabilitado hasta resolver conflicto de versiones
     '@nuxt/fonts',
   ],
 
@@ -74,4 +75,17 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000'
     }
   },
+
+  // i18n: {
+  //   locales: [
+  //     { code: 'es', iso: 'es-ES', name: 'Español' },
+  //     { code: 'en', iso: 'en-US', name: 'English' },
+  //   ],
+  //   defaultLocale: 'es',
+  //   strategy: 'no_prefix',
+  //   vueI18n: './app/i18n.config.ts',
+  //   compilation: {
+  //     strictMessage: false,
+  //   },
+  // },
 })

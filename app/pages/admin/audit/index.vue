@@ -1,9 +1,12 @@
 <script setup lang="ts">
 // Página de auditoría protegida
 definePageMeta({
-  middleware: 'permission:admin.access'
+  layout: 'default',
+  middleware: 'permission',
+  permissions: 'admin.access'
 })
 
+// const { t } = useI18n() // Temporalmente deshabilitado
 const { $api } = useNuxtApp()
 const { user } = useAuth()
 

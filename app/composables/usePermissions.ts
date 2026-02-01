@@ -41,9 +41,18 @@ export function usePermissions() {
    */
   function hasPermission(permission: string): boolean {
     if (!user.value?.permissions) {
+      if (import.meta.dev) {
+        console.warn('[usePermissions] No user permissions available:', { user: user.value })
+      }
       return false
     }
-    return user.value.permissions.includes(permission)
+    const has = user.value.permissions.includes(permission)
+    if (import.meta.dev) {
+      console.log(`[usePermissions] hasPermission('${permission}'):`, has, {
+        userPermissions: user.value.permissions
+      })
+    }
+    return has
   }
 
   /**
@@ -51,9 +60,22 @@ export function usePermissions() {
    */
   function hasAnyPermission(permissions: string[]): boolean {
     if (!user.value?.permissions || permissions.length === 0) {
+      if (import.meta.dev) {
+        console.warn('[usePermissions] No user permissions or empty array:', {
+          userPermissions: user.value?.permissions,
+          required: permissions
+        })
+      }
       return false
     }
-    return permissions.some(permission => user.value?.permissions?.includes(permission))
+    const has = permissions.some(permission => user.value?.permissions?.includes(permission))
+    if (import.meta.dev) {
+      console.log(`[usePermissions] hasAnyPermission([${permissions.join(', ')}]):`, has, {
+        userPermissions: user.value.permissions,
+        required: permissions
+      })
+    }
+    return has
   }
 
   /**

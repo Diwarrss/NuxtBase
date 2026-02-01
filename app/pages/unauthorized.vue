@@ -3,6 +3,7 @@ definePageMeta({
   layout: 'blank'
 })
 
+// const { t } = useI18n() // Temporalmente deshabilitado
 const { user } = useAuth()
 const router = useRouter()
 

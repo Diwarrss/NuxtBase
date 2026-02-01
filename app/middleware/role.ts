@@ -3,12 +3,20 @@
  * 
  * Uso en definePageMeta:
  * definePageMeta({
- *   middleware: 'role:admin'
+ *   middleware: 'role',
+ *   roles: 'admin'
  * })
  * 
  * O múltiples roles (cualquiera):
  * definePageMeta({
- *   middleware: 'role:admin|moderator'
+ *   middleware: 'role',
+ *   roles: ['admin', 'moderator']
+ * })
+ * 
+ * O usando string con separador |:
+ * definePageMeta({
+ *   middleware: 'role',
+ *   roles: 'admin|moderator'
  * })
  */
 export default defineNuxtRouteMiddleware((to, from) => {
@@ -34,28 +42,26 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return
   }
 
-  // Obtener roles requeridos del meta o de la ruta
-  const middlewareName = to.meta.middleware
-  let requiredRoles: string | string[] | undefined
-
-  // Si el middleware tiene parámetros en el nombre (formato: 'role:admin|moderator')
-  if (typeof middlewareName === 'string' && middlewareName.startsWith('role:')) {
-    const rolesStr = middlewareName.replace('role:', '')
-    requiredRoles = rolesStr.split('|').map(r => r.trim())
-  } else if (to.meta.roles) {
-    // También verificar en meta.roles por si se define directamente
-    requiredRoles = to.meta.roles as string | string[]
-  }
+  // Obtener roles requeridos del meta
+  // En Nuxt, los middlewares no pueden tener parámetros en el nombre
+  // Por lo tanto, usamos meta.roles para pasar los roles requeridos
+  const requiredRoles = to.meta.roles as string | string[] | undefined
 
   if (!requiredRoles) {
     // Si no hay roles requeridos, permitir acceso
     return
   }
 
-  // Convertir a array si es string
-  const roles = Array.isArray(requiredRoles)
-    ? requiredRoles
-    : [requiredRoles]
+  // Convertir a array si es string (puede venir como 'role1|role2' o como array)
+  let roles: string[]
+  if (typeof requiredRoles === 'string') {
+    // Si contiene |, dividir por ese separador
+    roles = requiredRoles.includes('|')
+      ? requiredRoles.split('|').map(r => r.trim())
+      : [requiredRoles]
+  } else {
+    roles = requiredRoles
+  }
 
   // Verificar si tiene alguno de los roles requeridos
   if (!hasAnyRole(roles)) {
