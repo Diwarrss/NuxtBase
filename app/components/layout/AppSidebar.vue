@@ -31,17 +31,15 @@ const teams: {
   },
 ]
 
-const user: {
-  name: string
-  email: string
-  avatar: string
-} = {
-  name: 'Dian Pratama',
-  email: 'dianpratama2@gmail.com',
-  avatar: '/avatars/avatartion.png',
-}
-
 const { sidebar } = useAppSettings()
+const { user: authUser } = useAuth()
+
+// Use authenticated user or fallback
+const user = computed(() => ({
+  name: authUser.value?.name || 'Usuario',
+  email: authUser.value?.email || '',
+  avatar: ''
+}))
 </script>
 
 <template>
@@ -62,7 +60,7 @@ const { sidebar } = useAppSettings()
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
-      <LayoutSidebarNavFooter :user="user" />
+      <LayoutSidebarNavFooter />
     </SidebarFooter>
     <SidebarRail />
   </Sidebar>

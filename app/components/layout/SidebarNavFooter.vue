@@ -1,19 +1,31 @@
 <script setup lang="ts">
 import { useSidebar } from '~/components/ui/sidebar'
 
-defineProps<{
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}>()
-
 const { isMobile, setOpenMobile } = useSidebar()
+const { user, logout, loading, fetchUser } = useAuth()
+const router = useRouter()
 
-function handleLogout() {
-  navigateTo('/login')
+async function handleLogout() {
+  try {
+    await logout()
+    await router.push('/login')
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error)
+    // Even if logout fails, redirect to login
+    await router.push('/login')
+  }
 }
+
+// Ensure user is available on mount
+onMounted(async () => {
+  if (!user.value) {
+    try {
+      await fetchUser()
+    } catch {
+      // ignore
+    }
+  }
+})
 
 const showModalTheme = ref(false)
 </script>
@@ -28,14 +40,13 @@ const showModalTheme = ref(false)
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarImage :src="user.avatar" :alt="user.name" />
               <AvatarFallback class="rounded-lg">
-                {{ user.name.split(' ').map((n) => n[0]).join('') }}
+                {{ user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U' }}
               </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-semibold">{{ user.name }}</span>
-              <span class="truncate text-xs">{{ user.email }}</span>
+              <span class="truncate font-semibold">{{ user?.name || 'Usuario' }}</span>
+              <span class="truncate text-xs">{{ user?.email || '' }}</span>
             </div>
             <Icon name="i-lucide-chevrons-up-down" class="ml-auto size-4" />
           </SidebarMenuButton>
@@ -48,14 +59,13 @@ const showModalTheme = ref(false)
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
-                <AvatarImage :src="user.avatar" :alt="user.name" />
                 <AvatarFallback class="rounded-lg">
-                  {{ user.name.split(' ').map((n) => n[0]).join('') }}
+                  {{ user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U' }}
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-semibold">{{ user.name }}</span>
-                <span class="truncate text-xs">{{ user.email }}</span>
+                <span class="truncate font-semibold">{{ user?.name || 'Usuario' }}</span>
+                <span class="truncate text-xs">{{ user?.email || '' }}</span>
               </div>
             </div>
           </DropdownMenuLabel>
@@ -95,9 +105,9 @@ const showModalTheme = ref(false)
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem @click="handleLogout">
+          <DropdownMenuItem @click="handleLogout" :disabled="loading">
             <Icon name="i-lucide-log-out" />
-            Log out
+            {{ loading ? 'Cerrando sesión...' : 'Cerrar sesión' }}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

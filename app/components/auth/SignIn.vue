@@ -2,23 +2,38 @@
 import { Loader2 } from 'lucide-vue-next'
 import PasswordInput from '~/components/PasswordInput.vue'
 
-const email = ref('demo@gmail.com')
-const password = ref('password')
-const isLoading = ref(false)
+const auth = useAuth()
+const router = useRouter()
 
-function onSubmit(event: Event) {
+const email = ref('')
+const password = ref('')
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+async function onSubmit(event: Event) {
   event.preventDefault()
   if (!email.value || !password.value)
     return
 
+  error.value = null
   isLoading.value = true
 
-  setTimeout(() => {
-    if (email.value === 'demo@gmail.com' && password.value === 'password')
-      navigateTo('/')
-
+  try {
+    await auth.login({
+      email: email.value,
+      password: password.value
+    })
+    // Redirect to home (admin dashboard)
+    await navigateTo('/')
+  } catch (e: any) {
+    // Laravel ValidationException comes as { errors: { field: [msg] } }
+    const firstFieldError =
+      e?.data?.errors?.email?.[0] ||
+      e?.data?.errors?.password?.[0]
+    error.value = firstFieldError || e?.data?.message || e?.message || 'Error al iniciar sesión'
+  } finally {
     isLoading.value = false
-  }, 3000)
+  }
 }
 </script>
 
@@ -45,6 +60,9 @@ function onSubmit(event: Event) {
       </Button>
     </div>
     <Separator label="Or continue with" />
+    <div v-if="error" class="rounded-lg border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
+      {{ error }}
+    </div>
     <div class="grid gap-2">
       <Label for="email">
         Email
@@ -58,6 +76,7 @@ function onSubmit(event: Event) {
         auto-capitalize="none"
         auto-complete="email"
         auto-correct="off"
+        required
       />
     </div>
     <div class="grid gap-2">
@@ -72,9 +91,9 @@ function onSubmit(event: Event) {
           Forgot your password?
         </NuxtLink>
       </div>
-      <PasswordInput id="password" v-model="password" />
+      <PasswordInput id="password" v-model="password" :disabled="isLoading" required />
     </div>
-    <Button type="submit" class="w-full" :disabled="isLoading">
+    <Button type="submit" class="w-full" :disabled="isLoading || !email || !password">
       <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
       Login
     </Button>

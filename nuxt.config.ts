@@ -67,4 +67,11 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-12-14',
+
+  runtimeConfig: {
+    public: {
+      // Laravel base URL (Sanctum SPA / cookies)
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000'
+    }
+  },
 })

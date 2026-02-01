@@ -2,6 +2,21 @@
 definePageMeta({
   layout: 'blank',
 })
+
+const { user, fetchUser } = useAuth()
+
+// Check if user is already logged in
+onMounted(async () => {
+  try {
+    await fetchUser()
+    if (user.value) {
+      // User is already logged in, redirect to home
+      await navigateTo('/')
+    }
+  } catch {
+    // User is not logged in, stay on login page
+  }
+})
 </script>
 
 <template>
@@ -12,7 +27,7 @@ definePageMeta({
           Welcome back
         </h1>
         <p class="text-balance text-sm text-muted-foreground">
-          Login with your Apple or Google account
+          Ingresa tus credenciales para continuar
         </p>
       </div>
       <AuthSignIn />
